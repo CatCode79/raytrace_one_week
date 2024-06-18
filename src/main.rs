@@ -1,9 +1,8 @@
 use glam::UVec2;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
-use sdl2::pixels::PixelFormatEnum;
-
-mod color;
+use sdl2::pixels::{Color, PixelFormatEnum};
+use sdl2::rect::Point;
 
 fn main() -> Result<(), String> {
     let sdl_context = sdl2::init()?;
@@ -16,9 +15,9 @@ fn main() -> Result<(), String> {
         .build()
         .map_err(|e| e.to_string())?;
 
-    let texture_size = {
+    let (window_width, window_height) = {
         let size = window.size();
-        UVec2::new(size.0 / 2, size.1 / 2)
+        (size.0, size.1)
     };
 
     let mut canvas = window
@@ -27,36 +26,23 @@ fn main() -> Result<(), String> {
         .build()
         .map_err(|e| e.to_string())?;
 
-    let creator = canvas.texture_creator();
-    let mut texture = {
-        let t = creator
-            .create_texture_target(PixelFormatEnum::RGB888, texture_size.x, texture_size.y)
-            .map_err(|e| e.to_string())?;
-        t
-    };
-
-    let mut image = vec![0_u8; (texture_size.x * texture_size.y * 3) as usize];
-
-    let mut x = 0;
-    while x < texture_size.x {
-        let mut y = 0;
-        while y < texture_size.y {
-            let r = x as f32 / texture_size.x as f32;
-            let g = y as f32 / texture_size.y as f32;
+    let mut x: i32 = 0;
+    while x < window_width as i32 {
+        let mut y: i32 = 0;
+        while y < window_height as i32 {
+            let r = x as f32 / window_width as f32;
+            let g = y as f32 / window_height as f32;
             let b = 0_f32;
 
-            image.insert((x * y  + x) as usize, (255.9999 * r) as u8);
-            image.insert((x * y  + x) as usize, (255.9999 * g) as u8);
-            image.insert((x * y  + x) as usize, (255.9999 * b) as u8);
+            // TODO: It's probably faster to use a texture
+            let color = Color::RGB((255.9999 * r) as u8, (255.9999 * g) as u8, (255.9999 * b) as u8);
+            canvas.set_draw_color(color);
+            canvas.draw_point(Point::new(x, y))?;
 
             y += 1;
         }
         x += 1;
     }
-
-    texture.update(None, image.as_slice(), (texture_size.x * 3) as usize)
-        .map_err(|e| e.to_string())?;
-    canvas.clear();
 
     'mainloop: loop {
         for event in sdl_context.event_pump()?.poll_iter() {
@@ -70,8 +56,6 @@ fn main() -> Result<(), String> {
             }
         }
 
-        println!("passa");
-        canvas.copy(&texture, None, None)?;
         canvas.present();
     }
 
