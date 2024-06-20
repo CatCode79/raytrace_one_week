@@ -1,74 +1,57 @@
-use sdl2::event::Event;
-use sdl2::keyboard::Keycode;
-use sdl2::pixels::Color;
-use sdl2::rect::Point;
-use sdl2::render::WindowCanvas;
-use sdl2::video::Window;
+use minifb::{Key, Window, WindowOptions};
+
+const WIDTH: u16 = 1280;
+const HEIGHT: u16 = 720;
 
 fn main() -> Result<(), String> {
-    let sdl_context = sdl2::init()?;
-    let video_subsystem = sdl_context.video()?;
+    let mut buffer: Vec<u32> = vec![0; WIDTH as usize * HEIGHT as usize];
 
-    let window = video_subsystem
-        .window("raytrace_one_week", 1280, 720)
-        .resizable()
-        //.maximized()
-        .build()
-        .map_err(|e| e.to_string())?;
+    let mut window = {
+        let options = WindowOptions {
+            resize: true,
+            ..Default::default()
+        };
+        Window::new(
+            "Raytracing in one week",
+            WIDTH as usize,
+            HEIGHT as usize,
+            options,
+        )
+    }.unwrap();
 
-    let (window_width, window_height) = {
-        let size = window.size();
-        (size.0, size.1)
-    };
+    while window.is_open() && !window.is_key_down(Key::Escape) {
+        render(&mut buffer);
 
-    let mut canvas = window
-        .into_canvas()
-        .accelerated()
-        .build()
-        .map_err(|e| e.to_string())?;
+        window
+            .update_with_buffer(&buffer, WIDTH as usize, HEIGHT as usize)
+            .unwrap();
 
-    'mainloop: loop {
-        for event in sdl_context.event_pump()?.poll_iter() {
-            match event {
-                Event::Quit { .. }
-                | Event::KeyDown {
-                    keycode: Some(Keycode::Escape),
-                    ..
-                } => break 'mainloop,
-                _ => {}
-            }
-        }
-
-        let _ = render(window_width, window_height, &mut canvas);
-
-        canvas.present();
         profiling::finish_frame!();
     }
 
     Ok(())
 }
 
-fn render(window_width: u32, window_height: u32, canvas: &mut WindowCanvas) -> Result<(), String> {
+fn render(buffer: &mut Vec<u32>) {
     profiling::scope!("render");
 
-
-    let mut x: i32 = 0;
-    while x < window_width as i32 {
-        let mut y: i32 = 0;
-        while y < window_height as i32 {
-            let r = x as f32 / window_width as f32;
-            let g = y as f32 / window_height as f32;
+    let mut x = 0;
+    while x < WIDTH {
+        let mut y = 0;
+        while y < HEIGHT {
+            let r = x as f32 / WIDTH as f32;
+            let g = y as f32 / HEIGHT as f32;
             let b = 0_f32;
 
-            // TODO: It's probably faster to use a texture
-            let color = Color::RGB((255.9999 * r) as u8, (255.9999 * g) as u8, (255.9999 * b) as u8);
-            canvas.set_draw_color(color);
-            canvas.draw_point(Point::new(x, y))?;
+            let r = (255.9999 * r) as u32;
+            let g = (255.9999 * g) as u32;
+            let b = (255.9999 * b) as u32;
+            let color = r << 16 | g << 8 | b;
+
+            buffer[x as usize * y as usize + x as usize] = color;
 
             y += 1;
         }
         x += 1;
     }
-
-    Ok(())
 }

@@ -11,4 +11,4 @@ version = "0.1.0"
 [dependencies]
 glam = "0.28"
 profiling = { version = "1", default-features = false, features = ["profile-with-tracy"]}
-sdl2 = "0.37"
+minifb = "0.27"
