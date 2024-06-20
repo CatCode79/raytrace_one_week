@@ -35,10 +35,10 @@ fn main() -> Result<(), String> {
 fn render(buffer: &mut Vec<u32>) {
     profiling::scope!("render");
 
-    let mut x = 0;
-    while x < WIDTH {
-        let mut y = 0;
-        while y < HEIGHT {
+    let mut y = 0;
+    while y < HEIGHT {
+        let mut x = 0;
+        while x < WIDTH {
             let r = x as f32 / WIDTH as f32;
             let g = y as f32 / HEIGHT as f32;
             let b = 0_f32;
@@ -50,8 +50,8 @@ fn render(buffer: &mut Vec<u32>) {
 
             buffer[x as usize * y as usize + x as usize] = color;
 
-            y += 1;
+            x += 1;
         }
-        x += 1;
+        y += 1;
     }
 }
