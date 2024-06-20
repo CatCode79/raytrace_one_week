@@ -1,8 +1,9 @@
-use glam::UVec2;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
-use sdl2::pixels::{Color, PixelFormatEnum};
+use sdl2::pixels::Color;
 use sdl2::rect::Point;
+use sdl2::render::WindowCanvas;
+use sdl2::video::Window;
 
 fn main() -> Result<(), String> {
     let sdl_context = sdl2::init()?;
@@ -26,6 +27,31 @@ fn main() -> Result<(), String> {
         .build()
         .map_err(|e| e.to_string())?;
 
+    'mainloop: loop {
+        for event in sdl_context.event_pump()?.poll_iter() {
+            match event {
+                Event::Quit { .. }
+                | Event::KeyDown {
+                    keycode: Some(Keycode::Escape),
+                    ..
+                } => break 'mainloop,
+                _ => {}
+            }
+        }
+
+        let _ = render(window_width, window_height, &mut canvas);
+
+        canvas.present();
+        profiling::finish_frame!();
+    }
+
+    Ok(())
+}
+
+fn render(window_width: u32, window_height: u32, canvas: &mut WindowCanvas) -> Result<(), String> {
+    profiling::scope!("render");
+
+
     let mut x: i32 = 0;
     while x < window_width as i32 {
         let mut y: i32 = 0;
@@ -42,21 +68,6 @@ fn main() -> Result<(), String> {
             y += 1;
         }
         x += 1;
-    }
-
-    'mainloop: loop {
-        for event in sdl_context.event_pump()?.poll_iter() {
-            match event {
-                Event::Quit { .. }
-                | Event::KeyDown {
-                    keycode: Some(Keycode::Escape),
-                    ..
-                } => break 'mainloop,
-                _ => {}
-            }
-        }
-
-        canvas.present();
     }
 
     Ok(())
