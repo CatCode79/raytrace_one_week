@@ -9,7 +9,10 @@ rust-version = "1.79"
 version = "0.1.0"
 
 [dependencies]
+bytemuck = "1"
 fenestella = { git = "https://github.com/CatCode79/fenestella" }
 glam = "0.28"
+log = "0.4"
+pollster = "0.3"
 profiling = { version = "1", default-features = false, features = ["profile-with-tracy"]}
-wgpu-hal = "0.21"
+wgpu = "0.20"
