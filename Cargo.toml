@@ -9,6 +9,7 @@ rust-version = "1.79"
 version = "0.1.0"
 
 [dependencies]
+fenestella = { git = "https://github.com/CatCode79/fenestella" }
 glam = "0.28"
 profiling = { version = "1", default-features = false, features = ["profile-with-tracy"]}
-minifb = "0.27"
+wgpu-hal = "0.21"

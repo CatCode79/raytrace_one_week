@@ -1,30 +1,30 @@
-use minifb::{Key, Window, WindowOptions};
+use fenestella::mapping::InputMapping;
+use fenestella::window::{Event, Window};
 
 const WIDTH: u16 = 1280;
 const HEIGHT: u16 = 720;
 
 fn main() -> Result<(), String> {
-    let mut buffer: Vec<u32> = vec![0; WIDTH as usize * HEIGHT as usize];
+    let mut buffer_width = WIDTH as usize;
+    let mut buffer_height = HEIGHT as usize;
+    let mut buffer = vec![0_u32; buffer_width * buffer_height];
 
-    let mut window = {
-        let options = WindowOptions {
-            resize: true,
-            ..Default::default()
-        };
-        Window::new(
-            "Raytracing in one week",
-            WIDTH as usize,
-            HEIGHT as usize,
-            options,
-        )
-    }.unwrap();
+    let input_mapping = InputMapping::new();
+    let mut window = Window::new("Raytrace One Week".to_string(), WIDTH, HEIGHT, input_mapping)?;
 
-    while window.is_open() && !window.is_key_down(Key::Escape) {
-        render(&mut buffer);
+    loop {
+        let events = window.process_events();
+        for event in events {
+            match event {
+                Event::Resize { mut width, mut height } => {
+                    buffer_width = width.get() as usize;
+                    buffer_height = height.get() as usize;
+                    buffer = vec![0_u32; buffer_width * buffer_height];
+                }
+            }
+        }
 
-        window
-            .update_with_buffer(&buffer, WIDTH as usize, HEIGHT as usize)
-            .unwrap();
+        draw(&mut buffer, buffer_width, buffer_height);
 
         profiling::finish_frame!();
     }
@@ -32,13 +32,13 @@ fn main() -> Result<(), String> {
     Ok(())
 }
 
-fn render(buffer: &mut Vec<u32>) {
+fn draw(buffer: &mut Vec<u32>, width: usize, height: usize) {
     profiling::scope!("render");
 
     let mut y = 0;
-    while y < HEIGHT {
+    while y < height {
         let mut x = 0;
-        while x < WIDTH {
+        while x < width {
             let r = x as f32 / WIDTH as f32;
             let g = y as f32 / HEIGHT as f32;
             let b = 0_f32;
@@ -48,7 +48,7 @@ fn render(buffer: &mut Vec<u32>) {
             let b = (255.9999 * b) as u32;
             let color = r << 16 | g << 8 | b;
 
-            buffer[x as usize * y as usize + x as usize] = color;
+            buffer[x * y + x] = color;
 
             x += 1;
         }
