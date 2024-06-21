@@ -50,23 +50,13 @@ fn main() -> Result<(), String> {
 fn draw(buffer: &mut Buffer) {
     profiling::scope!("render");
 
-    let mut y = 0;
-    while y < buffer.height {
-        let mut x = 0;
-        while x < buffer.width {
-            let r = x as f32 / WIDTH as f32;
-            let g = y as f32 / HEIGHT as f32;
-            let b = 0_f32;
+    for (i, pixel) in buffer.data.iter_mut().enumerate() {
+        let width = i % buffer.width as usize;
+        let height = i / buffer.width as usize;
 
-            let r = (255.9999 * r) as u32;
-            let g = (255.9999 * g) as u32;
-            let b = (255.9999 * b) as u32;
-            let color = r << 16 | g << 8 | b;
+        let r = width as f32 / buffer.width as f32;
+        let g = height as f32 / buffer.height as f32;
 
-            buffer.data[x as usize * y as usize + x as usize] = color;
-
-            x += 1;
-        }
-        y += 1;
+        *pixel = u32::from_ne_bytes([(255.9999 * r) as u8, (255.9999 * g) as u8, 0_u8, 255_u8]);
     }
 }
