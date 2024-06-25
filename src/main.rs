@@ -37,7 +37,7 @@ fn main() -> Result<(), String> {
             }
         }
 
-        draw(&mut buffer);
+        buffer.compute();
         renderer.update(&buffer)?;
 
         renderer.present();
@@ -45,18 +45,4 @@ fn main() -> Result<(), String> {
     }
 
     Ok(())
-}
-
-fn draw(buffer: &mut Buffer) {
-    profiling::scope!("render");
-
-    for (i, pixel) in buffer.data.iter_mut().enumerate() {
-        let width = i % buffer.width as usize;
-        let height = i / buffer.width as usize;
-
-        let r = width as f32 / buffer.width as f32;
-        let g = height as f32 / buffer.height as f32;
-
-        *pixel = u32::from_ne_bytes([(255.9999 * r) as u8, (255.9999 * g) as u8, 0_u8, 255_u8]);
-    }
 }

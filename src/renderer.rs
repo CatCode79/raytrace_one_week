@@ -1,4 +1,4 @@
-use std::num::NonZeroU16;
+use crate::buffer::Buffer;
 
 use fenestella::window::Window;
 use glam::U16Vec2;
@@ -6,7 +6,9 @@ use pollster::FutureExt as _;
 use wgpu::{Adapter, AddressMode, BindGroup, BindGroupDescriptor, BindGroupEntry, BindGroupLayout, BindGroupLayoutDescriptor, BindGroupLayoutEntry, BindingResource, BindingType, ColorTargetState, ColorWrites, CommandBuffer, CommandEncoder, CommandEncoderDescriptor, CompositeAlphaMode, Device, DeviceDescriptor, Extent3d, Features, FilterMode, FragmentState, ImageCopyTexture, ImageDataLayout, Instance, InstanceDescriptor, InstanceFlags, Limits, LoadOp, MultisampleState, Operations, PipelineCompilationOptions, PipelineLayoutDescriptor, PowerPreference, PresentMode, PrimitiveState, Queue, RenderPassColorAttachment, RenderPassDescriptor, RenderPipeline, RenderPipelineDescriptor, RequestAdapterOptions, Sampler, SamplerBindingType, SamplerDescriptor, ShaderModuleDescriptor, ShaderSource, ShaderStages, StoreOp, Surface, SurfaceConfiguration, SurfaceError, SurfaceTargetUnsafe, SurfaceTexture, TextureDescriptor, TextureDimension, TextureFormat, TextureSampleType, TextureUsages, TextureView, TextureViewDescriptor, TextureViewDimension, VertexState};
 use wgpu::util::DeviceExt as _;
 
-use crate::buffer::Buffer;
+use std::num::NonZeroU16;
+
+//= RENDERER =================================================================
 
 pub struct Renderer {
     surface: Surface<'static>,
@@ -142,7 +144,7 @@ impl Renderer {
     }
 }
 
-//= RENDERER CREATION ========================================================
+//= RENDERER SETUP ===========================================================
 
 /// The backends are in order of support, the greater the first.
 fn supported_backends() -> wgpu::Backends {
@@ -292,7 +294,7 @@ fn create_surface_config(
     })
 }
 
-//= TEXTURE ==================================================================
+//= TEXTURE HANDLER ==========================================================
 
 struct TextureHandler {
     pub handle: wgpu::Texture,
