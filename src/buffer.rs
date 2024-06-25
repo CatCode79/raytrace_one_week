@@ -1,7 +1,7 @@
 pub struct Buffer {
     pub(crate) width: u16,
     pub(crate) height: u16,
-    pub(crate) data: Vec<u32>
+    pub(crate) data: Vec<u32>,
 }
 
 impl Buffer {

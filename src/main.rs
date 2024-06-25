@@ -19,7 +19,12 @@ fn main() -> Result<(), String> {
     };
 
     let input_mapping = InputMapping::new();
-    let mut window = Window::new("Raytrace One Week".to_string(), WIDTH, HEIGHT, input_mapping)?;
+    let mut window = Window::new(
+        "Raytrace One Week".to_string(),
+        WIDTH,
+        HEIGHT,
+        input_mapping,
+    )?;
 
     let mut renderer = Renderer::new(&window)?;
 
